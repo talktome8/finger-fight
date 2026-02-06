@@ -1,4 +1,4 @@
-import type { TapEvent } from '../types/messages';
+import type { TapEvent } from '../types/messages.js';
 
 // ─── CPU Opponent AI ──────────────────────────────────────
 // Simulates realistic human tapping behavior

@@ -1,4 +1,4 @@
-import type { TapEvent } from '../types/messages';
+import type { TapEvent } from '../types/messages.js';
 
 // ─── Anti-Cheat Validation ────────────────────────────────
 // Framework-agnostic, runs on both client and server

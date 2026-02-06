@@ -1,6 +1,6 @@
-import type { Player, PlayerScore } from './player';
-import type { RoundConfig, RoundType } from './round';
-import type { MatchSettings, MatchState } from './game';
+import type { Player, PlayerScore } from './player.js';
+import type { RoundConfig, RoundType } from './round.js';
+import type { MatchSettings, MatchState } from './game.js';
 
 // ─── Client → Server Messages ─────────────────────────────
 export type ClientMessage =

@@ -42,10 +42,11 @@ export class GameServer {
   constructor(port: number) {
     this.rooms = new RoomManager();
 
-    // Try to find client dist folder (works both in dev and production layouts)
+    // Try to find client dist folder
     const possiblePaths = [
-      join(process.cwd(), 'client-dist'),       // Production: copied next to server
-      join(process.cwd(), '..', 'client', 'dist'), // Dev: monorepo structure
+      join(process.cwd(), 'client', 'dist'),        // Running from project root
+      join(process.cwd(), 'client-dist'),            // Copied next to server
+      join(process.cwd(), '..', 'client', 'dist'),   // Running from server dir
     ];
     const clientDist = possiblePaths.find((p) => existsSync(join(p, 'index.html'))) || '';
     const hasClientBuild = clientDist !== '';

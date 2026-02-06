@@ -1,5 +1,5 @@
-import type { Player, PlayerScore } from './player';
-import type { RoundType, RoundConfig } from './round';
+import type { Player, PlayerScore } from './player.js';
+import type { RoundType, RoundConfig } from './round.js';
 
 // ─── Room ─────────────────────────────────────────────────
 export interface Room {

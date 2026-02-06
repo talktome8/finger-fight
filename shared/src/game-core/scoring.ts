@@ -1,9 +1,9 @@
 import type {
   ScoringRule,
-} from '../types/round';
+} from '../types/round.js';
 import type {
   TapEvent,
-} from '../types/messages';
+} from '../types/messages.js';
 
 // ─── Scoring Engine ───────────────────────────────────────
 // Pure functions, no framework dependency

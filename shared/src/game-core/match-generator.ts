@@ -1,9 +1,9 @@
 import type {
   RoundConfig,
   RoundType,
-} from '../types/round';
-import type { MatchSettings } from '../types/game';
-import { ROUND_DEFINITIONS } from '../types/round';
+} from '../types/round.js';
+import type { MatchSettings } from '../types/game.js';
+import { ROUND_DEFINITIONS } from '../types/round.js';
 
 // ─── Match Generator ──────────────────────────────────────
 // Generates a sequence of rounds for a match
