@@ -10,12 +10,8 @@ export const useSettingsStore = defineStore('settings', () => {
   const serverUrl = ref(loadSetting('serverUrl', getDefaultServerUrl()));
 
   function getDefaultServerUrl(): string {
-    // In production, derive WS URL from page URL (same host)
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      return `${protocol}//${window.location.host}`;
-    }
-    return 'ws://localhost:3001';
+    // Production: use Render WebSocket server
+    return 'wss://finger-fight.onrender.com';
   }
 
   function loadSetting<T>(key: string, defaultValue: T): T {
