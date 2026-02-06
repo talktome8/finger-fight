@@ -159,19 +159,20 @@ export function setupNetworkHandlers(network: NetworkClient): void {
 
   network.on('match-starting', (msg) => {
     if (msg.type !== 'match-starting') return;
+    game.initOnline(lobby.players);
     game.updatePhase('countdown');
   });
 
   network.on('round-intro', (msg) => {
     if (msg.type !== 'round-intro') return;
     game.setRoundConfig(msg.config);
+    game.currentRound = msg.round;
     game.updatePhase('round-intro');
   });
 
   network.on('round-start', (msg) => {
     if (msg.type !== 'round-start') return;
     game.updatePhase('playing');
-    game.startRound();
   });
 
   network.on('round-tick', (msg) => {

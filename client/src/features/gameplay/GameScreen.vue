@@ -34,7 +34,7 @@
           :roundConfig="game.roundConfig!"
           :disabled="player.isCPU"
           :zoneIndex="idx"
-          @tap="onTap"
+          @tap="(tap: TapEvent) => onTap(tap, player)"
         />
       </div>
     </div>
@@ -60,6 +60,8 @@ import { computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
 import { useSettingsStore } from '@/stores/settings';
+import { useLobbyStore } from '@/stores/lobby';
+import { useNetwork } from '@/network/client';
 import type { TapEvent, Player } from '@finger-fight/shared';
 import CountdownOverlay from '@/components/CountdownOverlay.vue';
 import RoundIntro from '@/components/RoundIntro.vue';
@@ -77,14 +79,30 @@ const activePlayers = computed(() => {
   if (game.mode === 'solo') return [game.players[0]];
   if (game.mode === 'cpu') return game.players.filter((p) => !p.isCPU);
   if (game.mode === 'local') return game.players;
+  // Online: show only the local player's tap zone
+  if (game.mode === 'online') {
+    const lobby = useLobbyStore();
+    const me = game.players.find((p) => p.id === lobby.playerId);
+    return me ? [me] : game.players.slice(0, 1);
+  }
   return game.players.filter((p) => !p.isCPU);
 });
 
 const tapZoneCount = computed(() => activePlayers.value.length);
 
-function onTap(tap: TapEvent) {
+function onTap(tap: TapEvent, player?: Player) {
   settings.triggerHaptic('light');
-  game.recordTap(tap);
+  const playerId = player?.id;
+  game.recordTap(tap, playerId);
+
+  // In online mode, send taps to server
+  if (game.mode === 'online') {
+    const network = useNetwork();
+    network.send({
+      type: 'tap-data',
+      payload: { taps: [tap], timestamp: Date.now() },
+    });
+  }
 }
 
 onUnmounted(() => {

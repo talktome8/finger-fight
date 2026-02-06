@@ -41,8 +41,8 @@ export const useGameStore = defineStore('game', () => {
   const localPlayerCount = ref(2);
   const settings = ref<MatchSettings>({ ...DEFAULT_MATCH_SETTINGS });
 
-  // Tap collection
-  const tapBuffer = ref<TapEvent[]>([]);
+  // Tap collection — keyed by playerId
+  const tapBuffers = ref<Record<string, TapEvent[]>>({});
   const roundStartTime = ref(0);
 
   // Timers
@@ -80,6 +80,18 @@ export const useGameStore = defineStore('game', () => {
 
     phase.value = 'countdown';
     startCountdown();
+  }
+
+  function initOnline(playerList: Player[]) {
+    mode.value = 'online';
+    players.value = playerList;
+    currentRound.value = 0;
+    matchId.value = crypto.randomUUID?.() || Date.now().toString();
+    scores.value = playerList.map((p) => ({
+      playerId: p.id,
+      roundScores: [],
+      totalScore: 0,
+    }));
   }
 
   function generateRounds(playerList: Player[]): RoundConfig[] {
@@ -151,7 +163,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function startRound() {
-    tapBuffer.value = [];
+    tapBuffers.value = {};
     roundStartTime.value = Date.now();
     phase.value = 'playing';
 
@@ -168,9 +180,11 @@ export const useGameStore = defineStore('game', () => {
     });
   }
 
-  function recordTap(tap: TapEvent) {
+  function recordTap(tap: TapEvent, playerId?: string) {
     if (phase.value !== 'playing') return;
-    tapBuffer.value.push(tap);
+    const pid = playerId || players.value.find((p) => !p.isCPU)?.id || 'local';
+    if (!tapBuffers.value[pid]) tapBuffers.value[pid] = [];
+    tapBuffers.value[pid].push(tap);
   }
 
   function endRound() {
@@ -191,10 +205,8 @@ export const useGameStore = defineStore('game', () => {
             ? generateCPUReverseRoundTaps(cpuDifficulty.value, config.duration, 400, 600)
             : generateCPUTaps(cpuDifficulty.value, config.duration, 400, 600);
       } else {
-        // Use player's recorded taps
-        taps = tapBuffer.value.filter(
-          (t) => t.fingerId !== undefined // all user taps
-        );
+        // Use this specific player's recorded taps
+        taps = tapBuffers.value[player.id] || [];
       }
 
       // Validate
@@ -268,7 +280,7 @@ export const useGameStore = defineStore('game', () => {
     scores.value = [];
     currentRound.value = 0;
     roundConfig.value = null;
-    tapBuffer.value = [];
+    tapBuffers.value = {};
     gameTimer.stop();
     countdown.stop();
   }
@@ -300,7 +312,7 @@ export const useGameStore = defineStore('game', () => {
     roundConfig,
     roundTimeRemaining,
     countdownValue,
-    tapBuffer,
+    tapBuffers,
     cpuDifficulty,
     localPlayerCount,
     settings,
@@ -311,6 +323,7 @@ export const useGameStore = defineStore('game', () => {
     winner,
     // Actions
     startMatch,
+    initOnline,
     recordTap,
     reset,
     getPlayer,
