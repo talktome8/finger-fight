@@ -1,0 +1,26 @@
+{
+  "name": "finger-fight",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fast, social tap-based party game",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:shared": "cd shared && npx tsc",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npx tsc",
+    "build": "npm run build:shared && npm run build:server && npm run build:client && npm run postbuild",
+    "postbuild": "node -e \"const fs=require('fs');const p=require('path');const s=p.join('client','dist');const d=p.join('server','dist','client-dist');if(fs.existsSync(s)){fs.cpSync(s,d,{recursive:true});console.log('✅ Client dist copied to server/dist/client-dist')}\"",
+    "start": "cd server/dist && node index.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.0"
+  }
+}
